@@ -1,4 +1,4 @@
-from connection_info import *
+from Connection_Info import *
 from file_ops import file_ops
 from stdout_redirect import stdout_redirect
 
