@@ -92,14 +92,18 @@ class CentralServer(object):
                             sock.close()
                             input.remove(sock)
 
+
+    def process(self, data, ip):
+        print(data)
+
     def run(self, file):
         '''
         This probably won't look remotely like this in the final version,
         and thus is not getting formal documentation
         '''
+        print(self.ip_address)
         if not file:
             file = self.__file
         file_array = file_ops.file_to_bytes(file)
         self.send(file_array, '')
-        # TODO: Tory, call your listen function here
         self.listening()
