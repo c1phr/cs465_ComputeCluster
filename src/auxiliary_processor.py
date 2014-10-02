@@ -16,9 +16,16 @@ class AuxiliaryProcessor(object):
         return output
 
     def process(self, data, ip):
+        central_ip = ip
         in_file = file_ops.bytes_to_file(data)
         result = self.run_file(in_file)
-        #TODO: Chris, send result
+        #open the socket, set connections, connect to servers listen port,
+        #send process result, then close
+        self.socket_a = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket_a.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.socket_a.connect(central_ip, self.listen_port)
+        self.socket_a.send(result)
+        self.socket_a.close()
 
     def listening(self):
         self.connection = connection_info(socket.gethostbyname(socket.gethostname()))
