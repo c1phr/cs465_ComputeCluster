@@ -1,13 +1,14 @@
-from Connection_Info import *
+from connection_info import *
 from file_ops import file_ops
 from stdout_redirect import stdout_redirect
 import socket, select
 
 class AuxiliaryProcessor(object):
     def __init__(self):
-        self.ip_address = connection_info.Get_IP()
-        self.send_port = connection_info.Get_Send_Port()
-        self.listen_port = connection_info.Get_Listen_Port()
+        self.connection = connection_info(socket.gethostbyname(socket.gethostname()))
+        self.ip_address = self.connection.Get_IP()
+        self.send_port = self.connection.Get_Send_Port()
+        self.listen_port = self.connection.Get_Listen_Port()
 
     def run_file(self, file):
         output = ""
@@ -34,6 +35,7 @@ class AuxiliaryProcessor(object):
         self.socket_con.bind((socket.gethostname(), self.connection.listening_port))
         self.socket_con.listen(15)  # up to fifteen users can message at once. Can change later
         self.socket_con.setblocking(False)  # opens the non blocking channel
+        print(self.ip_address)
 
         if self.socket_con:
             input = [self.socket_con]
@@ -54,5 +56,5 @@ class AuxiliaryProcessor(object):
 
 
 if __name__ == "__main__":
-    # TODO: Tory, put your listen method call here
-    pass
+    aux = AuxiliaryProcessor()
+    aux.listening()
