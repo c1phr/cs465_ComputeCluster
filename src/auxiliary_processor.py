@@ -1,13 +1,14 @@
-from Connection_Info import *
+from connection_info import *
 from file_ops import file_ops
 from stdout_redirect import stdout_redirect
 import socket, select
 
 class AuxiliaryProcessor(object):
     def __init__(self):
-        self.ip_address = connection_info.Get_IP()
-        self.send_port = connection_info.Get_Send_Port()
-        self.listen_port = connection_info.Get_Listen_Port()
+        self.connection = connection_info(socket.gethostbyname(socket.gethostname()))
+        self.ip_address = self.connection.Get_IP()
+        self.send_port = self.connection.Get_Send_Port()
+        self.listen_port = self.connection.Get_Listen_Port()
 
     def run_file(self, file):
         output = ""

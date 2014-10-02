@@ -1,4 +1,4 @@
-from Connection_Info import *
+from connection_info import *
 from file_ops import file_ops
 import socket, select
 import sys
@@ -107,3 +107,7 @@ class CentralServer(object):
         file_array = file_ops.file_to_bytes(file)
         self.send(file_array, '')
         self.listening()
+
+if __name__ == "__main__":
+    serv = CentralServer()
+    serv.run()
