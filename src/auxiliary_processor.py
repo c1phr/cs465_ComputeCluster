@@ -14,11 +14,12 @@ class AuxiliaryProcessor(object):
             exec(open(file).read())
         return output
 
-    def run(self):
-        #TODO: Tory, put your listen method call here
-        #Ryan: I assume that the data read in from the socket is a variable called "in_bytes"
-        #Delete this when you actually write your section, I just don't want PyCharm angry with me
-        in_bytes = ""
-        in_file = file_ops.bytes_to_file(in_bytes)
+    def process(self, data, ip):
+        in_file = file_ops.bytes_to_file(data)
         result = self.run_file(in_file)
         #TODO: Chris, send result
+
+
+if __name__ == "__main__":
+    # TODO: Tory, put your listen method call here
+    pass
