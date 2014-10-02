@@ -1,6 +1,5 @@
-from Connection_Info import *
+from connection_info import *
 from file_ops import file_ops
-import socket, select
 
 class CentralServer(object):
     def __init__(self):
@@ -49,31 +48,6 @@ class CentralServer(object):
         else:
             sys.stderr.write( 'Error: specified node not in ready list' )
 
-    def listening(self):
-        self.connection = Connection_Info(socket.gethostbyname(socket.gethostname()))
-        self.socket_con = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # open socket
-        self.socket_con.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.socket_con.bind((socket.gethostname(), self.connection.listening_port))
-        self.socket_con.listen(15)  # up to fifteen users can message at once. Can change later
-        self.socket_con.setblocking(False)  # opens the non blocking channel
-
-        if self.socket_con:
-            input = [self.socket_con]
-            while True:
-                input_ready, output_ready, errors = select.select(input, [], [])
-
-                for sock in input_ready:
-                    if sock is self.socket_con:
-                        client, address = sock.accept()
-                        input.append(client)
-                    else:
-                        data = sock.recv(self.connection.buffer).decode()
-                        if data:
-                            self.process(data, address[0])
-                        else:
-                            sock.close()
-                            input.remove(sock)
-
     def run(self, file):
         '''
         This probably won't look remotely like this in the final version, and thus is not getting formal documentation
@@ -82,4 +56,4 @@ class CentralServer(object):
             file = self.__file
         file_array = file_ops.file_to_bytes(file)
         self.send(file_array)
-        self.listening()
+        # TODO: Tory, call your listen function here
