@@ -6,9 +6,10 @@ import sys
 
 class CentralServer(object):
     def __init__(self):
-        self.ip_address = connection_info.Get_IP()
-        self.send_port = connection_info.Get_Send_Port()
-        self.listen_port = connection_info.Get_Listen_Port()
+        self.connection = connection_info(socket.gethostbyname(socket.gethostname()))
+        self.ip_address = self.connection.Get_IP()
+        self.send_port = self.connection.Get_Send_Port()
+        self.listen_port = self.connection.Get_Listen_Port()
         self.__file = "test.py"
         # self.job_queue = Queue( 10 )
         # Job queue has a max size of 10
