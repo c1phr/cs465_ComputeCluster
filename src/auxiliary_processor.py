@@ -1,6 +1,7 @@
 from connection_info import *
 from file_ops import file_ops
 from stdout_redirect import stdout_redirect
+import socket, select
 
 class AuxiliaryProcessor(object):
     def __init__(self):
@@ -23,3 +24,28 @@ class AuxiliaryProcessor(object):
 if __name__ == "__main__":
     # TODO: Tory, put your listen method call here
     pass
+
+    def listening(self):
+        self.connection = connection_info(socket.gethostbyname(socket.gethostname()))
+        self.socket_con = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # open socket
+        self.socket_con.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.socket_con.bind((socket.gethostname(), self.connection.listening_port))
+        self.socket_con.listen(15)  # up to fifteen users can message at once. Can change later
+        self.socket_con.setblocking(False)  # opens the non blocking channel
+
+        if self.socket_con:
+            input = [self.socket_con]
+            while True:
+                input_ready, output_ready, errors = select.select(input, [], [])
+
+                for sock in input_ready:
+                    if sock is self.socket_con:
+                        client, address = sock.accept()
+                        input.append(client)
+                    else:
+                        data = sock.recv(self.connection.buffer).decode()
+                        if data:
+                            self.process(data, address[0])
+                        else:
+                            sock.close()
+                            input.remove(sock)
