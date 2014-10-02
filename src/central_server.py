@@ -10,7 +10,7 @@ class CentralServer(object):
         # self.job_queue = Queue( 10 )
         # Job queue has a max size of 10
 
-    def send( self, to_send ):
+    def send( self, to_send, aux_ip ):
         """
         Sends a job to an available compute node. 
         Jobs are just strings of python code which the target compute node
@@ -55,5 +55,5 @@ class CentralServer(object):
         if not file:
             file = self.__file
         file_array = file_ops.file_to_bytes(file)
-        self.send(file_array)
+        self.send(file_array, '')
         # TODO: Tory, call your listen function here
