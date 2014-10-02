@@ -43,8 +43,8 @@ class CentralServer(object):
         self.socket_cx.connect(
             (aux_ip, self.listen_port)
             )
-        self.socket_con2.send(to_send)
-        self.socket_con2.close()
+        self.socket_cx.send(to_send)
+        self.socket_cx.close()
 
     def move_to_wait(self, node):
         """
@@ -89,15 +89,15 @@ class CentralServer(object):
                         data = sock.recv(self.connection.buffer).decode()
                         if data:
                             self.process(data, address[0])
-                        else:
-                            sock.close()
-                            input.remove(sock)
+                        #else:
+                            #sock.close()
+                            #input.remove(sock)
 
 
     def process(self, data, ip):
         print(data)
 
-    def run(self, file):
+    def run(self, file="test.py"):
         '''
         This probably won't look remotely like this in the final version,
         and thus is not getting formal documentation
@@ -106,7 +106,7 @@ class CentralServer(object):
         if not file:
             file = self.__file
         file_array = file_ops.file_to_bytes(file)
-        self.send(file_array, '')
+        self.send(bytes(file_array, 'UTF-8'), '10.18.83.132')
         self.listening()
 
 if __name__ == "__main__":
