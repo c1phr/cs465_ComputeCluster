@@ -5,7 +5,7 @@ import sys
     :param new_stdout:
 '''
 
-class StdoutRedirect(object):
+class stdout_redirect(object):
     def __init__(self, stdout=None):
         self._stdout = stdout or sys.stdout        
 

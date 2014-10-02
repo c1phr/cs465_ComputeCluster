@@ -1,5 +1,5 @@
 from connection_info import *
-import file_ops
+from file_ops import file_ops
 
 class CentralServer(object):
     def __init__(self):

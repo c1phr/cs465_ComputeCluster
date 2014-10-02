@@ -1,9 +1,6 @@
 from random import randrange
 
-class FileOps(object):
-    def __init__(self):
-        pass
-
+class file_ops(object):
     '''
     Takes in the fully-qualified name of a file, opens it and returns a byte array representation
     :param file_name:
@@ -31,6 +28,6 @@ class FileOps(object):
 
 #Showing off that this all works
 if __name__ == "__main__":
-    bytes = FileOps.file_to_bytes('FileOps.py')
-    FileOps.bytes_to_file(bytes)
+    bytes = file_ops.file_to_bytes('file_ops.py')
+    file_ops.bytes_to_file(bytes)
     print(bytes)
