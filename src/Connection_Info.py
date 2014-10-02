@@ -1,4 +1,4 @@
-class Connection_Info(object):
+class connection_info(object):
     def __init__(self, ip_address):
         self.ip_address = ip_address
         self.listening_port = 3001
