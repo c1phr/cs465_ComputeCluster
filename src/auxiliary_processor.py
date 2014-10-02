@@ -1,3 +1,4 @@
+import os
 from connection_info import *
 from file_ops import file_ops
 from stdout_redirect import stdout_redirect
@@ -11,21 +12,22 @@ class AuxiliaryProcessor(object):
         self.listen_port = self.connection.Get_Listen_Port()
 
     def run_file(self, file):
-        output = ""
+        output = open("out.txt", 'w')
         with stdout_redirect(stdout=output):
             exec(open(file).read())
-        return output
+        #return output
 
     def process(self, data, ip):
         central_ip = ip
         in_file = file_ops.bytes_to_file(data)
-        result = self.run_file(in_file)
+        self.run_file(in_file)
+        file_arr = file_ops.file_to_bytes("out.txt")
         #open the socket, set connections, connect to servers listen port,
         #send process result, then close
         self.socket_a = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket_a.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.socket_a.connect(central_ip, self.listen_port)
-        self.socket_a.send(result)
+        self.socket_a.connect((central_ip, self.listen_port))
+        self.socket_a.send(file_arr)
         self.socket_a.close()
 
     def listening(self):
