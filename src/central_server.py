@@ -89,16 +89,10 @@ class CentralServer(object):
                         data = sock.recv(self.connection.buffer).decode()
                         if data:
                             self.process(data, address[0])
-<<<<<<< HEAD
                         else:
                             sock.close()
                             input.remove(sock)
                             exit()
-=======
-                        #else:
-                            #sock.close()
-                            #input.remove(sock)
->>>>>>> 08244182918f1a9c853563cc9f2f1234da9b2352
 
 
     def process(self, data, ip):
