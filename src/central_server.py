@@ -1,12 +1,13 @@
-from Connection_Info import *
-import queue.py
+from connection_info import *
+import file_ops
 
 class CentralServer(object):
     def __init__(self):
-        self.ip_address = self.Get_IP()
-        self.send_port = self.Get_Send_Port()
-        self.listen_port = self.Get_Listen_Port()
-        self.job_queue = Queue( 10 )
+        self.ip_address = Connection_Info.Get_IP()
+        self.send_port = Connection_Info.Get_Send_Port()
+        self.listen_port = Connection_Info.Get_Listen_Port()
+        self.__file = "test.py"
+        # self.job_queue = Queue( 10 )
         # Job queue has a max size of 10
 
     def send( self, to_send ):
@@ -47,3 +48,12 @@ class CentralServer(object):
         else:
             sys.stderr.write( 'Error: specified node not in ready list' )
 
+    def run(self, file):
+        '''
+        This probably won't look remotely like this in the final version, and thus is not getting formal documentation
+        '''
+        if not file:
+            file = self.__file
+        file_array = file_ops.file_to_bytes(file)
+        self.send(file_array)
+        # TODO: Tory, call your listen function here
