@@ -1,4 +1,4 @@
-from connection_info import *
+from Connection_Info import *
 from file_ops import file_ops
 import socket, select
 import sys
@@ -67,17 +67,6 @@ class CentralServer(object):
         else:
             sys.stderr.write('Error: specified node not in ready list')
 
-    def run(self, file):
-        '''
-        This probably won't look remotely like this in the final version,
-        and thus is not getting formal documentation
-        '''
-        if not file:
-            file = self.__file
-        file_array = file_ops.file_to_bytes(file)
-        self.send(file_array, '')
-        # TODO: Tory, call your listen function here
-
     def listening(self):
         self.connection = connection_info(socket.gethostbyname(socket.gethostname()))
         self.socket_con = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # open socket
@@ -102,3 +91,15 @@ class CentralServer(object):
                         else:
                             sock.close()
                             input.remove(sock)
+
+    def run(self, file):
+        '''
+        This probably won't look remotely like this in the final version,
+        and thus is not getting formal documentation
+        '''
+        if not file:
+            file = self.__file
+        file_array = file_ops.file_to_bytes(file)
+        self.send(file_array, '')
+        # TODO: Tory, call your listen function here
+        self.listening()

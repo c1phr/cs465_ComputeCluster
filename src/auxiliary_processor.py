@@ -1,4 +1,4 @@
-from connection_info import *
+from Connection_Info import *
 from file_ops import file_ops
 from stdout_redirect import stdout_redirect
 import socket, select
@@ -19,11 +19,6 @@ class AuxiliaryProcessor(object):
         in_file = file_ops.bytes_to_file(data)
         result = self.run_file(in_file)
         #TODO: Chris, send result
-
-
-if __name__ == "__main__":
-    # TODO: Tory, put your listen method call here
-    pass
 
     def listening(self):
         self.connection = connection_info(socket.gethostbyname(socket.gethostname()))
@@ -49,3 +44,8 @@ if __name__ == "__main__":
                         else:
                             sock.close()
                             input.remove(sock)
+
+
+if __name__ == "__main__":
+    # TODO: Tory, put your listen method call here
+    pass
