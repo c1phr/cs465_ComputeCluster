@@ -11,5 +11,4 @@ def do_work():
 
 
 for y in range(5):
-
     do_work()
