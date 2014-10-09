@@ -14,8 +14,9 @@ class AuxiliaryProcessor(object):
     def run_file(self, file):
         output = open("out.txt", 'w')
         with stdout_redirect(stdout=output):
-            exec(open(file).read())
-        #return output
+            #exec(open(file).read())
+            module = __import__(file[:-3])
+            module.main()
 
     def process(self, data, ip):
         central_ip = ip
