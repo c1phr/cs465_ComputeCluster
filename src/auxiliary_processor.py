@@ -1,7 +1,6 @@
 import os
 from connection_info import *
 from file_ops import file_ops
-from stdout_redirect import stdout_redirect
 import socket, select
 
 class AuxiliaryProcessor(object):
@@ -12,11 +11,8 @@ class AuxiliaryProcessor(object):
         self.listen_port = self.connection.Get_Listen_Port()
 
     def run_file(self, file):
-        output = open("out.txt", 'w')
-        with stdout_redirect(stdout=output):
-            #exec(open(file).read())
-            module = __import__(file[:-3])
-            module.main()
+        module = __import__(file[:-3])
+        module.main()
 
     def process(self, data, ip):
         central_ip = ip

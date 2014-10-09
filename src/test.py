@@ -11,8 +11,10 @@ def new_rand():
 def do_work():
 
     x = ((new_rand() + new_rand()) * new_rand()) % new_rand()
-    print(x)
+    return x
 
 def main():
+    out = ""
     for y in range(5):
-        do_work()
+        out += str(do_work()) + "\n"
+    return out
