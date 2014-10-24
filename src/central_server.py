@@ -1,6 +1,9 @@
+import json
+# noinspection PyUnresolvedReferences
+from multiprocessing import Queue
 from Connection_Info import *
 from file_ops import file_ops
-import socket, select
+import socket, select, sys
 
 class CentralServer(object):
     def __init__(self):
@@ -8,8 +11,8 @@ class CentralServer(object):
         self.send_port = Connection_Info.Get_Send_Port()
         self.listen_port = Connection_Info.Get_Listen_Port()
         self.__file = "test.py"
-        # self.job_queue = Queue( 10 )
-        # Job queue has a max size of 10
+        self._peer_list = {}
+        self.job_queue = Queue()
 
     def send( self, to_send ):
         """
@@ -74,12 +77,36 @@ class CentralServer(object):
                             sock.close()
                             input.remove(sock)
 
-    def run(self, file):
-        '''
-        This probably won't look remotely like this in the final version, and thus is not getting formal documentation
-        '''
-        if not file:
-            file = self.__file
-        file_array = file_ops.file_to_bytes(file)
-        self.send(file_array)
+    def process(self, data, ip):
+        data_dict = json.loads(data)
+
+        #Connect
+        if data_dict["flag"] == "c":
+            if ip:
+                self._peer_list[ip] = True
+
+        #Disconnect
+        if data_dict["flag"] == "d":
+            if ip:
+                del self._peer_list
+
+        #Returning data
+        if data_dict["flag"] == "r":
+            print(ip + " --> " + data_dict["body"])
+            self._peer_list[ip] = True
+
+    def run(self, file="test.py"):
+        print(self.ip_address)
+
+        while True:
+            for ip, avail in self._peer_list:
+                if avail:
+                    self._peer_list[ip] = not avail
+                    if len(self.job_queue) > 0:
+                        # Operation will block if there is nothing in the queue until we have a job to execute
+                        job = self.job_queue.get(block=True)
+                        file_array = file_ops.file_to_bytes(job)
+                        self.send(bytes(file_array, 'UTF-8'), ip)
+
+        # TODO: We need to run this in a separate thread somehow
         self.listening()
