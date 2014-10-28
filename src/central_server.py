@@ -1,7 +1,7 @@
 import json
 # noinspection PyUnresolvedReferences
 from multiprocessing import Queue
-from Connection_Info import *
+from connection_info import *
 from file_ops import file_ops
 import socket, select, sys
 
