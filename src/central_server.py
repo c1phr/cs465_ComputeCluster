@@ -14,7 +14,7 @@ class CentralServer(object):
         self._peer_list = {}
         self.job_queue = Queue()
 
-    def send( self, to_send ):
+    def send( self, to_send, ip):
         """
         Sends a job to an available compute node. 
         Jobs are just strings of python code which the target compute node
