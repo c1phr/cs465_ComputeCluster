@@ -10,11 +10,13 @@ class CentralServer(object):
         self.ip_address = Connection_Info.Get_IP()
         self.send_port = Connection_Info.Get_Send_Port()
         self.listen_port = Connection_Info.Get_Listen_Port()
-        self.__file = "test.py"
         self._peer_list = {}
         self.job_queue = Queue()
 
-    def send( self, to_send, ip):
+    def add_to_queue(self, file_name):
+        self.job_queue.put(file_name)
+
+    def send( self, to_send, ip ):
         """
         Sends a job to an available compute node. 
         Jobs are just strings of python code which the target compute node
@@ -29,28 +31,6 @@ class CentralServer(object):
 
         to_send: a string containing the job to be sent. 
         """
-
-    def move_to_wait( self, node ):
-        """
-        node: the node to move to 'waiting' is passed in
-        """
-        if self.get_ready_list.pop( node ):
-            self.set_waiting_list(
-                    self.get_waiting_list().append( node )
-                    )
-        else:
-            sys.stderr.write( 'Error: specified node not in ready list' )
-
-    def move_to_ready( self, node ):
-        """
-        node: the node to move to 'ready' is passed in
-        """
-        if self.get_waiting_list.pop( node ):
-            self.set_ready_list(
-                    self.get_ready_list().append( node )
-                    )
-        else:
-            sys.stderr.write( 'Error: specified node not in ready list' )
 
     def listening(self):
         self.connection = Connection_Info(socket.gethostbyname(socket.gethostname()))
