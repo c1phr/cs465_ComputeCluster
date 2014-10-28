@@ -4,6 +4,8 @@ from multiprocessing import Queue
 from connection_info import *
 from file_ops import file_ops
 import socket, select, sys
+from message import Message
+
 
 class CentralServer(object):
     def __init__(self):
@@ -90,7 +92,7 @@ class CentralServer(object):
             print(ip + " --> " + data_dict["body"])
             self._peer_list[ip] = True
 
-    def run(self, file="test.py"):
+    def run(self):
         print(self.ip_address)
 
         while True:
@@ -99,27 +101,12 @@ class CentralServer(object):
                     self._peer_list[ip] = not avail
                     if len(self.job_queue) > 0:
                         # Operation will block if there is nothing in the queue until we have a job to execute
-                        job = self.job_queue.get(block=True)
-                        file_array = file_ops.file_to_bytes(job)
-                        self.send(bytes(file_array, 'UTF-8'), ip)
+                        file = self.job_queue.get(block=True)
+                        file_array = file_ops.file_to_bytes(file)
+                        job_message = Message('j', (file, bytes(file_array, 'UTF-8')))
+                        self.send(job_message, ip)
 
         # TODO: We need to run this in a separate thread somehow
-        self.listening()
-
-
-    def process(self, data, ip):
-        print(data)
-
-    def run(self, file="test.py"):
-        '''
-        This probably won't look remotely like this in the final version,
-        and thus is not getting formal documentation
-        '''
-        print(self.ip_address)
-        if not file:
-            file = self.__file
-        file_array = file_ops.file_to_bytes(file)
-        self.send(bytes(file_array, 'UTF-8'), '')  # TODO: I NEED TO GET AN IP FROM THE FRONT-END
         self.listening()
 
 if __name__ == "__main__":

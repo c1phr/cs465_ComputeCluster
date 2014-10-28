@@ -1,7 +1,6 @@
-import os
 from connection_info import *
 from file_ops import file_ops
-import socket, select, message
+import socket, select, message, multiprocessing
 
 class AuxiliaryProcessor(object):
     def __init__(self):
@@ -9,14 +8,15 @@ class AuxiliaryProcessor(object):
         self.send_port = Connection_Info.Get_Send_Port()
         self.listen_port = Connection_Info.Get_Listen_Port()
         self.central_ip = ""
-        self.avail_threads = 4
+        self.jobs = []
+        self.avail_threads = multiprocessing.cpu_count()
+        self.__proc_pool = multiprocessing.Pool()  # Creates a process pool with the number of cores the machine has
 
     def run_file(self, file):
         module = __import__(file[:-3])
         module.main()
 
     def process(self, data, ip):
-        central_ip = ip
         in_file = file_ops.bytes_to_file(data)
         self.run_file(in_file)
         file_arr = file_ops.file_to_bytes("out.txt")
@@ -24,7 +24,7 @@ class AuxiliaryProcessor(object):
         #send process result, then close
         self.socket_a = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket_a.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.socket_a.connect((central_ip, self.listen_port))
+        self.socket_a.connect((ip, self.listen_port))
         self.socket_a.send(file_arr)
         self.socket_a.close()
 
@@ -91,7 +91,8 @@ class AuxiliaryProcessor(object):
                     else:
                         data = sock.recv(self.connection.buffer).decode()
                         if data:
-                            self.process(data, address[0])
+                            # The following will send off the file to be processed async by a process from the pool
+                            proc = self.__proc_pool.apply_async(self.process, [data, address[0]])
                         else:
                             sock.close()
                             input.remove(sock)
