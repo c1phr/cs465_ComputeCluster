@@ -9,9 +9,10 @@ from message import Message
 
 class CentralServer(object):
     def __init__(self):
-        self.ip_address = Connection_Info.Get_IP()
-        self.send_port = Connection_Info.Get_Send_Port()
-        self.listen_port = Connection_Info.Get_Listen_Port()
+        self.connection = Connection_Info(socket.gethostbyname(socket.gethostname()))
+        self.ip_address = self.connection.get_ip()
+        self.send_port = self.connection.get_send_port()
+        self.listen_port = self.connection.get_listening_port()
         self._peer_list = {}
         self.job_queue = Queue()
 

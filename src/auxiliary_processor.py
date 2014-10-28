@@ -4,9 +4,10 @@ import socket, select, message, multiprocessing
 
 class AuxiliaryProcessor(object):
     def __init__(self):
-        self.ip_address = Connection_Info.Get_IP()
-        self.send_port = Connection_Info.Get_Send_Port()
-        self.listen_port = Connection_Info.Get_Listen_Port()
+        self.connection = Connection_Info(socket.gethostbyname(socket.gethostname()))
+        self.ip_address = self.connection.get_ip()
+        self.send_port = self.connection.get_send_port()
+        self.listen_port = self.connection.get_listening_port()
         self.central_ip = ""
         self.jobs = []
         self.avail_threads = multiprocessing.cpu_count()
@@ -66,7 +67,7 @@ class AuxiliaryProcessor(object):
 
         self.socket_con2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # open socket
         self.socket_con2.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.socket_con2.connect((self.central_ip, self.connection.Get_Listen_Port()))  # connect to particular ip
+        self.socket_con2.connect((self.central_ip, self.connection.get_listening_port()))  # connect to particular ip
         self.socket_con2.send(to_send)  # send the JSON encoded message
         self.socket_con2.close()  # close the socket
 
