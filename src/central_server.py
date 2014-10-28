@@ -16,21 +16,36 @@ class CentralServer(object):
     def add_to_queue(self, file_name):
         self.job_queue.put(file_name)
 
-    def send( self, to_send, ip ):
+    def send(self, to_send, aux_ip):
         """
-        Sends a job to an available compute node. 
-        Jobs are just strings of python code which the target compute node
-        will execute. They're stored in CentralServer.job_queue. 
-        To track which node we should send the job to, we have a "ready
-        list," and a "working list;" the former tracks nodes which are ready
-        to compute, and the latter tracks which nodes have had a job sent
-        and still not gotten any response. When a compute node is ready, the
-        server grabs a job from the end of the queue, sends it to that
-        node (with this method), and then moves that entry in the ready list into the waiting
-        list. 
+        Sends a job to an available compute node. Jobs are just strings of
+        python code which the target compute node will execute. They're
+        stored in CentralServer.job_queue. To track which node we should
+        send the job to, we have a "ready list," and a "working list;" the
+        former tracks nodes which are ready to compute, and the latter
+        tracks which nodes have had a job sent and still not gotten any
+        response. When a compute node is ready, the server grabs a job from
+        the end of the queue, sends it to that node (with this method), and
+        then moves that entry in the ready list into the waiting list.
 
-        to_send: a string containing the job to be sent. 
+        ** For Proof-of-Concept **
+        aux_ip directs the ip to send the job to.
+
+        to_send: a string containing the job to be sent.
         """
+        # Socket options: use ipv4
+        self.socket_cx = socket.socket(
+            socket.AF_INET, socket.SOCK_STREAM
+            )
+        # More options: socket level, reuse socket
+        self.socket_cx.setsockopt(
+            socket.SOL_SOCKET, socket.SO_REUSEADDR, 1
+            )
+        self.socket_cx.connect(
+            (aux_ip, self.listen_port)
+            )
+        self.socket_cx.send(to_send)
+        self.socket_cx.close()
 
     def listening(self):
         self.connection = Connection_Info(socket.gethostbyname(socket.gethostname()))
@@ -90,3 +105,23 @@ class CentralServer(object):
 
         # TODO: We need to run this in a separate thread somehow
         self.listening()
+
+
+    def process(self, data, ip):
+        print(data)
+
+    def run(self, file="test.py"):
+        '''
+        This probably won't look remotely like this in the final version,
+        and thus is not getting formal documentation
+        '''
+        print(self.ip_address)
+        if not file:
+            file = self.__file
+        file_array = file_ops.file_to_bytes(file)
+        self.send(bytes(file_array, 'UTF-8'), '')  # TODO: I NEED TO GET AN IP FROM THE FRONT-END
+        self.listening()
+
+if __name__ == "__main__":
+    serv = CentralServer()
+    serv.run()
