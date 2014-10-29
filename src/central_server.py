@@ -31,11 +31,15 @@ class CentralServer(object):
         the end of the queue, sends it to that node (with this method), and
         then moves that entry in the ready list into the waiting list.
 
-        ** For Proof-of-Concept **
-        aux_ip directs the ip to send the job to.
+        aux_ip directs the ip to which the job should be sent.
 
-        to_send: a string containing the job to be sent.
+        to_send: a message containing the job to be sent. send() converts the
+        string into JSON.
         """
+
+        # JSON-ify the message to be sent.
+        to_send.To_Json().encode()
+
         # Socket options: use ipv4
         self.socket_cx = socket.socket(
             socket.AF_INET, socket.SOCK_STREAM
@@ -44,6 +48,7 @@ class CentralServer(object):
         self.socket_cx.setsockopt(
             socket.SOL_SOCKET, socket.SO_REUSEADDR, 1
             )
+        # Establish a connection
         self.socket_cx.connect(
             (aux_ip, self.listen_port)
             )
