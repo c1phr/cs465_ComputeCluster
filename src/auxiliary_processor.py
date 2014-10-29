@@ -1,14 +1,14 @@
-from connection_info import *
+from Connection_Info import *
 from file_ops import file_ops
 import socket, select, message, multiprocessing
 
 class AuxiliaryProcessor(object):
-    def __init__(self):
+    def __init__(self, ip):
         self.connection = Connection_Info(socket.gethostbyname(socket.gethostname()))
         self.ip_address = self.connection.get_ip()
         self.send_port = self.connection.get_send_port()
         self.listen_port = self.connection.get_listening_port()
-        self.central_ip = ""
+        self.central_ip = ip
         self.jobs = []
         self.avail_threads = multiprocessing.cpu_count()
         self.__proc_pool = multiprocessing.Pool()  # Creates a process pool with the number of cores the machine has
@@ -17,13 +17,15 @@ class AuxiliaryProcessor(object):
         module = __import__(file[:-3])
         return module.main()
 
+    #Is the ip argument being used in the def? Am I not seeing it?
     def process(self, data, ip):
         in_file = file_ops.bytes_to_file(data)
         out = self.run_file(in_file)
         return_message = message.Message("r", out)
         self.send_message(return_message)
 
-    def connect(self):
+    #need ip argument here??
+    def connect(self, ip):
         """
         Connect to a central server using the given ip
         """
