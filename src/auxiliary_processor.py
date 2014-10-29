@@ -1,4 +1,4 @@
-from Connection_Info import *
+from connection_info import *
 from file_ops import file_ops
 import socket, select, message, multiprocessing
 
