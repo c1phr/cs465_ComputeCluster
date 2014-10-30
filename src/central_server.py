@@ -4,6 +4,7 @@ from Connection_Info import *
 from multiprocessing import *
 #from multiprocessing.context import Process
 from multiprocessing.queues import Queue
+from connection_info import Connection_Info
 from file_ops import file_ops
 import socket, select, sys
 from message import Message
@@ -84,6 +85,17 @@ class CentralServer(object):
                             sock.close()
                             input.remove(sock)
 
+                if len(self._peer_list) > 0:
+                    for ip, avail in self._peer_list:
+                            if avail:
+                                self._peer_list[ip] = not avail
+                                if len(self.job_queue) > 0:
+                                    # Operation will block if there is nothing in the queue until we have a job to execute
+                                    file = self.job_queue.get(block=True)
+                                    file_array = file_ops.file_to_bytes(file)
+                                    job_message = Message('j', (file, bytes(file_array, 'UTF-8')))
+                                    self.send(job_message, ip)
+
     def process(self, data, ip):
         data_dict = json.loads(data)
 
@@ -91,6 +103,7 @@ class CentralServer(object):
         if data_dict["flag"] == "c":
             if ip:
                 self._peer_list[ip] = True
+                print (ip + " connected!")
 
         #Disconnect
         if data_dict["flag"] == "d":
@@ -104,7 +117,6 @@ class CentralServer(object):
 
     def run(self):
         print(self.ip_address)
-        print("Im here")
         while True:
             for ip, avail in self._peer_list:
                 if avail:
@@ -117,7 +129,7 @@ class CentralServer(object):
                         self.send(job_message, ip)
 
     def start_server(self):
-        Server_Run = Process(target=self.run)
-        Server_Run.start()
+        #Server_Run = Process(target=self.run)
+        #Server_Run.start()
         Server_List = Process(target=self.listening)
         Server_List.start()
