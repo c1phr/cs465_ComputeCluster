@@ -18,7 +18,11 @@ def main():
         process_files = os.listdir("to_process")
         print(process_files)
         server = CentralServer()
+        server.run()
         print("Server IP: " + server.ip_address)
+        for i in process_files:
+            server.add_to_queue(i)
+        return
 
 
     #if you're not the server, you must be a satellite
@@ -27,6 +31,8 @@ def main():
         print("Enter the IP of the server:\n")
         input_serverIP = input()
         satellite = AuxiliaryProcessor(input_serverIP)
+        satellite.connect(input_serverIP)
+        satellite.listening()
         print("Waiting for incoming jobs...\n")
 
     return

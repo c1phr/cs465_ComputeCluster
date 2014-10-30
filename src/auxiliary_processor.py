@@ -17,14 +17,12 @@ class AuxiliaryProcessor(object):
         module = __import__(file[:-3])
         return module.main()
 
-    #Is the ip argument being used in the def? Am I not seeing it?
     def process(self, data, ip):
         in_file = file_ops.bytes_to_file(data)
         out = self.run_file(in_file)
         return_message = message.Message("r", out)
         self.send_message(return_message)
 
-    #need ip argument here??
     def connect(self, ip):
         """
         Connect to a central server using the given ip
