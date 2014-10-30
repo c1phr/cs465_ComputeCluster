@@ -1,6 +1,6 @@
-import json
+import json, threading
 # noinspection PyUnresolvedReferences
-from multiprocessing import Queue
+from multiprocessing import *
 from connection_info import *
 from file_ops import file_ops
 import socket, select, sys
@@ -13,6 +13,7 @@ class CentralServer(object):
         self.ip_address = self.connection.get_ip()
         self.send_port = self.connection.get_send_port()
         self.listen_port = self.connection.get_listening_port()
+        self.lock = 0
         self._peer_list = {}
         self.job_queue = Queue()
 
@@ -112,9 +113,9 @@ class CentralServer(object):
                         job_message = Message('j', (file, bytes(file_array, 'UTF-8')))
                         self.send(job_message, ip)
 
-        # TODO: We need to run this in a separate thread somehow
-        self.listening()
-
 if __name__ == "__main__":
-    serv = CentralServer()
-    serv.run()
+    server = CentralServer()
+    Server_Run = Process(target=server.run())
+    Server_Run.start()
+    Server_List = Process(target=server.listening())
+    Server_List.start()
