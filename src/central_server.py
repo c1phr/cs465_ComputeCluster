@@ -86,14 +86,14 @@ class CentralServer(object):
                 if len(self._peer_list) > 0:
                     for ip, avail in self._peer_list.items():
                             if avail:
-                                self._peer_list[ip] = not avail
+                                self._peer_list[ip] = False
                                 if (self.job_queue.qsize()) > 0:
                                     # Operation will block if there is nothing in the queue until we have a job to execute
                                     file = self.job_queue.get()
                                     file_array = file_ops.file_to_bytes(file)
                                     #job_message = Message('j', (file, bytes(file_array, 'UTF-8')))
                                     job_message = (bytes(file_array, 'UTF-8'))
-                                    print("Sending " + file)
+                                    print("Sending: " + file)
                                     self.send(job_message, ip)
 
     def process(self, data, ip):
@@ -114,6 +114,7 @@ class CentralServer(object):
         if data_dict["flag"] == "r":
             print(ip + " --> " + data_dict["body"])
             self._peer_list[ip] = True
+            print(self._peer_list)
 
     def run(self):
         print(self.ip_address)
