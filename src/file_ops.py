@@ -19,7 +19,8 @@ class file_ops(object):
     '''
     @staticmethod
     def bytes_to_file(arr):
-        new_name = str(randrange(1000)) + '.py'
+        #new_name = str(randrange(1000)) + '.py'
+        new_name = "in_file.py"
         new_file = open(new_name, 'w')
         new_file.write(arr)
         new_file.close()

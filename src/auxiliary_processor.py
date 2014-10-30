@@ -1,6 +1,6 @@
 from connection_info import Connection_Info
 from file_ops import file_ops
-import socket, select, message, threading
+import socket, select, message, threading, os
 
 class AuxiliaryProcessor(object):
     def __init__(self, ip):
@@ -11,6 +11,7 @@ class AuxiliaryProcessor(object):
         self.central_ip = ip
         self.jobs = []
         self.avail_threads = 4
+        self.__lock = threading.Lock()
 
 
     def run_file(self, file):
@@ -18,10 +19,13 @@ class AuxiliaryProcessor(object):
         return module.main()
 
     def process(self, data, ip):
-        in_file = file_ops.bytes_to_file(data)
-        out = self.run_file(in_file)
-        return_message = message.Message("r", out)
-        self.send_message(return_message)
+        with self.__lock:
+            in_file = file_ops.bytes_to_file(data)
+            out = self.run_file(in_file)
+            return_message = message.Message("r", out)
+            print("Sending from file: " + in_file + " data: " + out)
+            os.remove(in_file)
+            self.send_message(return_message)
 
     def connect(self, ip):
         """
