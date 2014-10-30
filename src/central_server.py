@@ -84,16 +84,16 @@ class CentralServer(object):
                             sock.close()
                             input.remove(sock)
 
-        if len(self._peer_list) > 0:
-            for ip, avail in self._peer_list:
-                    if avail:
-                        self._peer_list[ip] = not avail
-                        if len(self.job_queue) > 0:
-                            # Operation will block if there is nothing in the queue until we have a job to execute
-                            file = self.job_queue.get(block=True)
-                            file_array = file_ops.file_to_bytes(file)
-                            job_message = Message('j', (file, bytes(file_array, 'UTF-8')))
-                            self.send(job_message, ip)
+                if len(self._peer_list) > 0:
+                    for ip, avail in self._peer_list:
+                            if avail:
+                                self._peer_list[ip] = not avail
+                                if len(self.job_queue) > 0:
+                                    # Operation will block if there is nothing in the queue until we have a job to execute
+                                    file = self.job_queue.get(block=True)
+                                    file_array = file_ops.file_to_bytes(file)
+                                    job_message = Message('j', (file, bytes(file_array, 'UTF-8')))
+                                    self.send(job_message, ip)
 
     def process(self, data, ip):
         data_dict = json.loads(data)
