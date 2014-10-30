@@ -1,6 +1,5 @@
 import json, threading
 # noinspection PyUnresolvedReferences
-from Connection_Info import *
 from multiprocessing import *
 #from multiprocessing.context import Process
 from multiprocessing.queues import Queue
