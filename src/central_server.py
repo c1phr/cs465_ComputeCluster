@@ -1,6 +1,8 @@
 import json, threading
 # noinspection PyUnresolvedReferences
 from multiprocessing import *
+from multiprocessing.context import Process
+from multiprocessing.queues import Queue
 from connection_info import *
 from file_ops import file_ops
 import socket, select, sys
@@ -113,9 +115,8 @@ class CentralServer(object):
                         job_message = Message('j', (file, bytes(file_array, 'UTF-8')))
                         self.send(job_message, ip)
 
-if __name__ == "__main__":
-    server = CentralServer()
-    Server_Run = Process(target=server.run())
-    Server_Run.start()
-    Server_List = Process(target=server.listening())
-    Server_List.start()
+    def start_server(self):
+        Server_Run = Process(target=self.run())
+        Server_Run.start()
+        Server_List = Process(target=self.listening())
+        Server_List.start()
