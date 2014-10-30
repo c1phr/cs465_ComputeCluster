@@ -18,7 +18,7 @@ def main():
         process_files = os.listdir("to_process")
         print(process_files)
         server = CentralServer()
-        server.run()
+        server.start_server()
         print("Server IP: " + server.ip_address)
         for i in process_files:
             server.add_to_queue("to_process/" + i)
