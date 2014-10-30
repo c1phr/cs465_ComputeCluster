@@ -1,12 +1,11 @@
 import json, threading
 # noinspection PyUnresolvedReferences
-from Connection_Info import *
 from multiprocessing import *
 #from multiprocessing.context import Process
-from multiprocessing.queues import Queue
 from connection_info import Connection_Info
 from file_ops import file_ops
 import socket, select, sys
+import queue
 from message import Message
 
 
@@ -18,7 +17,7 @@ class CentralServer(object):
         self.listen_port = self.connection.get_listening_port()
         self.lock = 0
         self._peer_list = {}
-        self.job_queue = Queue()
+        self.job_queue = queue.Queue()
 
     def add_to_queue(self, file_name):
         self.job_queue.put(file_name)
@@ -42,7 +41,7 @@ class CentralServer(object):
         """
 
         # JSON-ify the message to be sent.
-        to_send.To_Json().encode()
+        #to_send.To_Json().encode()
 
         # Socket options: use ipv4
         self.socket_cx = socket.socket(
@@ -60,7 +59,6 @@ class CentralServer(object):
         self.socket_cx.close()
 
     def listening(self):
-        print("I'm Here too!")
         self.connection = Connection_Info(socket.gethostbyname(socket.gethostname()))
         self.socket_con = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # open socket
         self.socket_con.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -86,14 +84,16 @@ class CentralServer(object):
                             input.remove(sock)
 
                 if len(self._peer_list) > 0:
-                    for ip, avail in self._peer_list:
+                    for ip, avail in self._peer_list.items():
                             if avail:
                                 self._peer_list[ip] = not avail
-                                if len(self.job_queue) > 0:
+                                if (self.job_queue.qsize()) > 0:
                                     # Operation will block if there is nothing in the queue until we have a job to execute
-                                    file = self.job_queue.get(block=True)
+                                    file = self.job_queue.get()
                                     file_array = file_ops.file_to_bytes(file)
-                                    job_message = Message('j', (file, bytes(file_array, 'UTF-8')))
+                                    #job_message = Message('j', (file, bytes(file_array, 'UTF-8')))
+                                    job_message = (bytes(file_array, 'UTF-8'))
+                                    print("Sending " + file)
                                     self.send(job_message, ip)
 
     def process(self, data, ip):
