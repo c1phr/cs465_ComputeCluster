@@ -1,6 +1,6 @@
 from connection_info import Connection_Info
 from file_ops import file_ops
-import socket, select, message, multiprocessing
+import socket, select, message, threading
 
 class AuxiliaryProcessor(object):
     def __init__(self, ip):
@@ -10,8 +10,8 @@ class AuxiliaryProcessor(object):
         self.listen_port = self.connection.get_listening_port()
         self.central_ip = ip
         self.jobs = []
-        self.avail_threads = multiprocessing.cpu_count()
-        self.__proc_pool = multiprocessing.Pool()  # Creates a process pool with the number of cores the machine has
+        self.avail_threads = 4
+
 
     def run_file(self, file):
         module = __import__(file[:-3])
@@ -63,7 +63,9 @@ class AuxiliaryProcessor(object):
                             # The following will send off the file to be processed async by a process from the pool
                             #proc = self.__proc_pool.apply_async(self.process, [data, address[0]])
                             #proc.start()
-                            self.process(data, address[0])
+                            proc = threading.Thread(target=self.process, args=(data, address[0],))
+                            proc.start()
+                            #self.process(data, address[0])
                         else:
                             sock.close()
                             input.remove(sock)
