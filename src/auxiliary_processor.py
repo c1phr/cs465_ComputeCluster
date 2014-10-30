@@ -1,4 +1,3 @@
-from Connection_Info import *
 from connection_info import Connection_Info
 from file_ops import file_ops
 import socket, select, message, multiprocessing
@@ -62,7 +61,9 @@ class AuxiliaryProcessor(object):
                         data = sock.recv(self.connection.buffer).decode()
                         if data:
                             # The following will send off the file to be processed async by a process from the pool
-                            proc = self.__proc_pool.apply_async(self.process, [data, address[0]])
+                            #proc = self.__proc_pool.apply_async(self.process, [data, address[0]])
+                            #proc.start()
+                            self.process(data, address[0])
                         else:
                             sock.close()
                             input.remove(sock)
