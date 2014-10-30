@@ -1,7 +1,7 @@
 import json, threading
 # noinspection PyUnresolvedReferences
 from multiprocessing import *
-from connection_info import *
+from Connection_Info import *
 from file_ops import file_ops
 import socket, select, sys
 from message import Message
@@ -57,6 +57,7 @@ class CentralServer(object):
         self.socket_cx.close()
 
     def listening(self):
+        print("I'm Here too!")
         self.connection = Connection_Info(socket.gethostbyname(socket.gethostname()))
         self.socket_con = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # open socket
         self.socket_con.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -101,7 +102,7 @@ class CentralServer(object):
 
     def run(self):
         print(self.ip_address)
-
+        print("Im here")
         while True:
             for ip, avail in self._peer_list:
                 if avail:
@@ -115,7 +116,7 @@ class CentralServer(object):
 
 if __name__ == "__main__":
     server = CentralServer()
-    Server_Run = Process(target=server.run())
+    Server_Run = Process(target=server.run)
     Server_Run.start()
-    Server_List = Process(target=server.listening())
+    Server_List = Process(target=server.listening)
     Server_List.start()
