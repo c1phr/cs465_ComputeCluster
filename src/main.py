@@ -21,7 +21,7 @@ def main():
         server.run()
         print("Server IP: " + server.ip_address)
         for i in process_files:
-            server.add_to_queue(i)
+            server.add_to_queue("to_process/" + i)
         return
 
 
