@@ -15,6 +15,6 @@ def do_work():
 
 def main():
     out = ""
-    for y in range(5):
+    for y in range(10):
         out += str(do_work()) + "\n"
     return out

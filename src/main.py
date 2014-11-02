@@ -1,5 +1,6 @@
 from auxiliary_processor import AuxiliaryProcessor
 from central_server import CentralServer
+from user import User
 import os
 import glob
 
@@ -9,25 +10,26 @@ import glob
 def main():
 
     print("Welcome to Compute Cluster!\n")
-    print("Are you a Server? (y/n)\n")
+    print("Are you a (s)erver, (p)rocessor or (u)ser? (s/p/u)\n")
     input_identity = input()
 
     #if you're the server
-    if input_identity == "y":
+    if input_identity == "s":
         #Fetch folder with list of job files
         process_files = os.listdir("to_process")
         print(process_files)
         server = CentralServer()
         #server.start_server()
         print("Server IP: " + server.ip_address)
-        for i in process_files:
-            server.add_to_queue("to_process/" + i)
+        # We don't need this part anymore since we have a separate peer connection
+        # for i in process_files:
+        #     server.add_to_queue("to_process/" + i)
         server.listening()
         return
 
 
-    #if you're not the server, you must be a satellite
-    else:
+    #if you're not the server, are you a satellite?
+    elif input_identity == "p":
         print("Starting Satellite ...\n")
         print("Enter the IP of the server:\n")
         input_serverIP = input()
@@ -35,6 +37,15 @@ def main():
         satellite.connect(input_serverIP)
         satellite.listening()
         print("Waiting for incoming jobs...\n")
+
+    else:
+        print("Starting user mode...\n")
+        print("Enter the IP of the server:\n")
+        input_serverIP = input()
+        user = User(input_serverIP)
+        user.connect()
+        user.listening()
+        #TODO: Get file to send to the server
 
     return
 

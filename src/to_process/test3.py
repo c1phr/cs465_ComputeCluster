@@ -14,7 +14,8 @@ def do_work():
     return x
 
 def main():
-    out = ""
+    out = []
     for y in range(5):
-        out += str(do_work()) + "\n"
+        #out += "{" + y + ":" +str(do_work()) + "}"
+        out.append(do_work())
     return out

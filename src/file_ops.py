@@ -18,13 +18,13 @@ class file_ops(object):
     :return name of Python program:
     '''
     @staticmethod
-    def bytes_to_file(arr):
-        #new_name = str(randrange(1000)) + '.py'
-        new_name = "in_file.py"
-        new_file = open(new_name, 'w')
+    def bytes_to_file(arr, path="", name="in_file.py"):
+        if len(path) > 0 and path[-1] != "/":
+            path += "/"
+        new_file = open(path + name, 'w')
         new_file.write(arr)
         new_file.close()
-        return new_name
+        return name
 
 
 #Showing off that this all works

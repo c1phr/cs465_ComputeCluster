@@ -20,7 +20,7 @@ class AuxiliaryProcessor(object):
 
     def process(self, data, ip):
         with self.__lock:
-            in_file = file_ops.bytes_to_file(data)
+            in_file = file_ops.bytes_to_file(data, "processing/")
             out = self.run_file(in_file)
             return_message = message.Message("r", out)
             print("Sending from file: " + in_file + " data: " + out)
@@ -32,7 +32,7 @@ class AuxiliaryProcessor(object):
         Connect to a central server using the given ip
         """
         # Connect to the central server and tell it how many threads we have
-        join_message = message.Message('c', self.avail_threads)
+        join_message = message.Message('pc', self.avail_threads)
         self.send_message(join_message)
 
     def send_message(self, message):

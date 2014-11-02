@@ -18,6 +18,7 @@ class CentralServer(object):
         self.lock = 0
         self._peer_list = {}
         self.job_queue = queue.Queue()
+        self._user_list = []
 
     def add_to_queue(self, file_name):
         self.job_queue.put(file_name)
@@ -99,11 +100,16 @@ class CentralServer(object):
     def process(self, data, ip):
         data_dict = json.loads(data)
 
-        #Connect
-        if data_dict["flag"] == "c":
+        #Processor Connection
+        if data_dict["flag"] == "pc":
             if ip:
                 self._peer_list[ip] = True
                 print (ip + " connected!")
+
+        if data_dict["flag"] == "uc":
+            if ip:
+                self._user_list.append(ip)
+                print("User connected from: " + ip)
 
         #Disconnect
         if data_dict["flag"] == "d":
@@ -115,6 +121,11 @@ class CentralServer(object):
             print(ip + " --> " + data_dict["body"])
             self._peer_list[ip] = True
             print(self._peer_list)
+
+        #Recieving File
+        if data_dict["flag"] == "f":
+            print("Recieved file from " + ip)
+
 
     def run(self):
         print(self.ip_address)
