@@ -33,7 +33,7 @@ def main():
         print("Starting Satellite ...\n")
         print("Enter the IP of the server:\n")
         input_serverIP = input()
-        satellite = AuxiliaryProcessor(input_serverIP)
+        satellite = AuxiliaryProcessor()
         satellite.connect(input_serverIP)
         satellite.listening()
         print("Waiting for incoming jobs...\n")
@@ -42,8 +42,8 @@ def main():
         print("Starting user mode...\n")
         print("Enter the IP of the server:\n")
         input_serverIP = input()
-        user = User(input_serverIP)
-        user.connect()
+        user = User()
+        user.connect(input_serverIP)
         user.listening()
         #TODO: Get file to send to the server
 

@@ -3,12 +3,12 @@ from file_ops import file_ops
 import socket, select, message, threading, os
 
 class AuxiliaryProcessor(object):
-    def __init__(self, ip):
+    def __init__(self):
         self.connection = Connection_Info(socket.gethostbyname(socket.gethostname()))
         self.ip_address = self.connection.get_ip()
         self.send_port = self.connection.get_send_port()
         self.listen_port = self.connection.get_listening_port()
-        self.central_ip = ip
+        self.central_ip = ""
         self.jobs = []
         self.avail_threads = 4
         self.__lock = threading.Lock()
@@ -32,6 +32,7 @@ class AuxiliaryProcessor(object):
         Connect to a central server using the given ip
         """
         # Connect to the central server and tell it how many threads we have
+        self.central_ip = ip
         join_message = message.Message('pc', self.avail_threads)
         self.send_message(join_message)
 

@@ -8,12 +8,12 @@ from message import Message
 
 
 class User(object):
-    def __init__(self, server_ip):
+    def __init__(self):
         self.connection = Connection_Info(socket.gethostbyname(socket.gethostname()))
         self.ip_address = self.connection.get_ip()
         self.send_port = self.connection.get_send_port()
         self.listen_port = self.connection.get_listening_port()
-        self.server_ip = server_ip
+        self.server_ip = ""
 
 
     def send(self, to_send, aux_ip):
@@ -51,6 +51,15 @@ class User(object):
             )
         self.socket_cx.send(to_send)
         self.socket_cx.close()
+
+    def send_message(self, message):
+        # Serialize the data into JSON so it can be sent over the socket
+        to_send = message.To_Json().encode()
+        self.socket_con2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # open socket
+        self.socket_con2.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.socket_con2.connect((self.server_ip, self.connection.get_listening_port()))  # connect to particular ip
+        self.socket_con2.send(to_send)  # send the JSON encoded message
+        self.socket_con2.close()  # close the socket
 
     def listening(self):
         self.connection = Connection_Info(socket.gethostbyname(socket.gethostname()))
@@ -97,7 +106,8 @@ class User(object):
         Connect to a central server using the given ip
         """
         # Connect to the central server and tell it how many threads we have
-        join_message = Message('uc', self.avail_threads)
+        self.server_ip = ip
+        join_message = Message('uc', "")
         self.send_message(join_message)
 
     def run(self):
