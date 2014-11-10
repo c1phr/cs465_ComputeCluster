@@ -50,19 +50,23 @@ class AuxiliaryProcessor(object):
         self.socket_con = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # open socket
         self.socket_con.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket_con.bind((socket.gethostname(), self.connection.listening_port))
-        self.socket_con.listen(15)  # up to fifteen users can message at once. Can change later
+        self.socket_con.listen(5) # Queue up 5 connections, this is just the default
         self.socket_con.setblocking(False)  # opens the non blocking channel
 
         if self.socket_con:
             input = [self.socket_con]
             while True:
+                # We're going to ignore output_ready and errors, but we need to stuff select's full output somewhere
                 input_ready, output_ready, errors = select.select(input, [], [])
 
                 for sock in input_ready:
+                    # If the item in input_ready is our socket connection
                     if sock is self.socket_con:
                         client, address = sock.accept()
                         input.append(client)
-                    else:
+                    else: # We have new input to process
+                        # Decode the bytestream representing the program to be executed into a string so that it can be
+                        # dumped into a .py for execution
                         data = sock.recv(self.connection.buffer).decode()
                         if data:
                             # The following will send off the file to be processed async by a process from the pool
