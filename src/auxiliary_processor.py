@@ -1,6 +1,6 @@
 from connection_info import Connection_Info
 from file_ops import file_ops
-import socket, select, message, threading, os
+import socket, select, message, os, json
 
 class AuxiliaryProcessor(object):
     def __init__(self):
@@ -10,8 +10,6 @@ class AuxiliaryProcessor(object):
         self.listen_port = self.connection.get_listening_port()
         self.central_ip = ""
         self.jobs = []
-        self.avail_threads = 4
-        self.__lock = threading.Lock()
 
 
     def run_file(self, file):
@@ -22,8 +20,10 @@ class AuxiliaryProcessor(object):
             return "Bad program format"
 
     def process(self, data, ip):
-        with self.__lock:
-            in_file = file_ops.bytes_to_file(data, "")
+        data_dict = json.loads(data)
+
+        if data_dict["flag"] == "j":
+            in_file = file_ops.bytes_to_file(data_dict["body"], "")
             out = self.run_file(in_file)
             return_message = message.Message("r", out)
             print("Sending from file: " + in_file + " data: " + out)
@@ -72,12 +72,7 @@ class AuxiliaryProcessor(object):
                         # dumped into a .py for execution
                         data = sock.recv(self.connection.buffer).decode()
                         if data:
-                            # The following will send off the file to be processed async by a process from the pool
-                            #proc = self.__proc_pool.apply_async(self.process, [data, address[0]])
-                            #proc.start()
-                            proc = threading.Thread(target=self.process, args=(data, address[0],))
-                            proc.start()
-                            #self.process(data, address[0])
+                            self.process(data, address[0])
                         else:
                             sock.close()
                             input.remove(sock)
