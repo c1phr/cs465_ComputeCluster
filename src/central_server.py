@@ -102,6 +102,7 @@ class CentralServer(object):
                 self._peer_list[ip] = True
                 print (ip + " connected!")
 
+        #User Connection
         if data_dict["flag"] == "uc":
             if ip:
                 self._user_list.append(ip)

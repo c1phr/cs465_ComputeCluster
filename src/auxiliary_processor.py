@@ -16,7 +16,10 @@ class AuxiliaryProcessor(object):
 
     def run_file(self, file):
         module = __import__(file[:-3])
-        return module.main()
+        try:
+            return module.main()
+        except AttributeError:
+            return "Bad program format"
 
     def process(self, data, ip):
         with self.__lock:
