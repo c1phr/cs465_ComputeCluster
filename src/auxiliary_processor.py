@@ -23,12 +23,12 @@ class AuxiliaryProcessor(object):
 
     def process(self, data, ip):
         with self.__lock:
-            in_file = file_ops.bytes_to_file(data, "processing/")
+            in_file = file_ops.bytes_to_file(data, "")
             out = self.run_file(in_file)
             return_message = message.Message("r", out)
             print("Sending from file: " + in_file + " data: " + out)
-            os.remove(in_file)
             self.send_message(return_message)
+            os.remove(in_file)
 
     def connect(self, ip):
         """
