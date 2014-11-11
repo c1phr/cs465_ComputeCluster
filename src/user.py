@@ -69,6 +69,8 @@ class User(object):
         self.socket_con.listen(5)
         self.socket_con.setblocking(False)  # opens the non blocking channel
 
+
+        #If a connection has been established, receive the data
         if self.socket_con:
             input = [self.socket_con]
             while True:
@@ -91,13 +93,18 @@ class User(object):
 
         #Returning data
         if data_dict["flag"] == "r":
+            #prints original sent out data
             print("Raw data --> " + data)
+            #prints new data it was just given by central server
             print("Returned data --> " + data_dict["body"])
             self._peer_list[ip] = True
             print(self._peer_list)
 
+    #sends the file to be processed to the central server
     def send_file(self, file):
+        #converts the file into bytes
         file_bytes = file_ops.file_to_bytes(file)
+        #sends the file as a message to the central server to denote receiving from this user
         to_send = Message("f", file_bytes)
         self.send(to_send, self.server_ip)
 

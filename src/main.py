@@ -44,8 +44,9 @@ def main():
         input_serverIP = input()
         user = User()
         user.connect(input_serverIP)
+
+        user.send_file(file_ops)
         user.listening()
-        #TODO: Get file to send to the server
 
     return
 
