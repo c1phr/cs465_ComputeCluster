@@ -11,13 +11,13 @@ from message import Message
 class CentralServer(object):
     def __init__(self):
         self.connection = Connection_Info(socket.gethostbyname(socket.gethostname()))
-        self.ip_address = self.connection.get_ip()
-        self.send_port = self.connection.get_send_port()
-        self.listen_port = self.connection.get_listening_port()
-        self.lock = 0
-        self._peer_list = {}
-        self.job_queue = queue.Queue()
-        self._user_list = []
+        self.ip_address = self.connection.get_ip()              #grabs it owns ip
+        self.send_port = self.connection.get_send_port()        #grabs the send to send through
+        self.listen_port = self.connection.get_listening_port() #grabs listening port
+        self.lock = 0                   #locking mechanism
+        self._peer_list = {}            #grabs a list of aux peers that are connected currently
+        self.job_queue = queue.Queue()  #Holds the queue for the files to be processed
+        self._user_list = []            #holds the list of suers connected
         self._user_job_table = {}  # {aux_ip, user_ip} -> Used so we know what user gets output from who
 
     def send(self, to_send, aux_ip):
@@ -53,7 +53,7 @@ class CentralServer(object):
         self.socket_cx.send(to_send)
         self.socket_cx.close()
 
-    def listening(self):
+    def listening(self):        #opens the listening line
         self.connection = Connection_Info(socket.gethostbyname(socket.gethostname()))
         self.socket_con = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # open socket
         self.socket_con.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -61,6 +61,7 @@ class CentralServer(object):
         self.socket_con.listen(15)  # up to fifteen users can message at once. Can change later
         self.socket_con.setblocking(False)  # opens the non blocking channel
 
+        #if something came in, process it
         if self.socket_con:
             input = [self.socket_con]
             while True:
@@ -71,29 +72,29 @@ class CentralServer(object):
                         client, address = sock.accept()
                         input.append(client)
                     else:
-                        data = sock.recv(self.connection.buffer).decode()
+                        data = sock.recv(self.connection.buffer).decode()   #decode the message out of JSON
                         if data:
-                            self.process(data, address[0])
+                            self.process(data, address[0])  #process the data that came in from particualr ip
                         else:
-                            sock.close()
-                            input.remove(sock)
+                            sock.close()        #close out the socket
+                            input.remove(sock)  #Remove the socket
 
-                if len(self._peer_list) > 0:
+                if len(self._peer_list) > 0:    #if there is a peer connected, send a job
                     for ip, avail in self._peer_list.items():
-                        if avail:
-                            # Lock the aux processor so it doens't get more jobs until this one is done
+                        if avail:   #if peer is available, send net job
+                            # Lock the aux processor so it doesn't get more jobs until this one is done
                             self._peer_list[ip] = False
-                            if (self.job_queue.qsize()) > 0:
+                            if (self.job_queue.qsize()) > 0:    #if jobs are currently waiting
                                 # Operation will block if there is nothing in the queue until we have a job to execute
-                                job = self.job_queue.get()
-                                file_array = file_ops.file_to_bytes(job[1])
-                                job_message = Message('j', bytes(file_array, 'UTF-8'))
+                                job = self.job_queue.get()  #get the next job fro the queue
+                                file_array = file_ops.file_to_bytes(job[1]) #convert the file to bytes
+                                job_message = Message('j', bytes(file_array, 'UTF-8'))  #create the message with the job
                                 print("Sending job from: " + job[0])
-                                self._user_job_table[ip] = job[0]
-                                self.send(job_message, ip)
+                                self._user_job_table[ip] = job[0]   #gets the next ip from the table
+                                self.send(job_message, ip)      #sends file to working ip
 
     def process(self, data, ip):
-        data_dict = json.loads(data)
+        data_dict = json.loads(data)    #convert data to JSON standard
 
         # Processor Connection
         if data_dict["flag"] == "pc":
