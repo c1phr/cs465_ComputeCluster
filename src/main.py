@@ -4,9 +4,6 @@ from user import User
 import os
 import glob
 
-# modules = glob.glob(os.path.dirname("to_process")+"/*.py")
-# __all__ = [ os.path.basename(f)[:-3] for f in modules]
-
 def main():
 
     print("Welcome to Compute Cluster!\n")
@@ -42,10 +39,11 @@ def main():
         print("Starting user mode...\n")
         print("Enter the IP of the server:\n")
         input_serverIP = input()
+        print("Enter the path of the file that you would like to run:\n")
+        input_file = input()
         user = User()
         user.connect(input_serverIP)
-
-        user.send_file(file_ops)
+        user.send_file(input_file)
         user.listening()
 
     return

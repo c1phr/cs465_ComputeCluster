@@ -1,11 +1,10 @@
-import json, threading
-# noinspection PyUnresolvedReferences
-from multiprocessing import *
-#from multiprocessing.context import Process
+import json
+import socket
+import select
+import queue
+
 from connection_info import Connection_Info
 from file_ops import file_ops
-import socket, select, sys
-import queue
 from message import Message
 
 
@@ -40,9 +39,6 @@ class CentralServer(object):
         to_send: a message containing the job to be sent. send() converts the
         string into JSON.
         """
-
-        # JSON-ify the message to be sent.
-        #to_send.To_Json().encode()
 
         # Socket options: use ipv4
         self.socket_cx = socket.socket(
@@ -139,10 +135,3 @@ class CentralServer(object):
                         file_array = file_ops.file_to_bytes(file)
                         job_message = Message('j', (file, bytes(file_array, 'UTF-8')))
                         self.send(job_message, ip)
-
-    def start_server(self):
-        #Server_Run = Process(target=self.run)
-        #Server_Run.start()
-        #Server_List = Process(target=self.listening)
-        #Server_List.start()
-        pass

@@ -93,9 +93,9 @@ class User(object):
 
         #Returning data
         if data_dict["flag"] == "r":
-            #prints original sent out data
+            #prints original sent out data for demonstration sake
             print("Raw data --> " + data)
-            #prints new data it was just given by central server
+            #prints new data it was just given by central server which was returned from the processing result
             print("Returned data --> " + data_dict["body"])
             self._peer_list[ip] = True
             print(self._peer_list)
@@ -116,13 +116,3 @@ class User(object):
         self.server_ip = ip
         join_message = Message('uc', "")
         self.send_message(join_message)
-
-    def run(self):
-        pass
-
-    def start_server(self):
-        #Server_Run = Process(target=self.run)
-        #Server_Run.start()
-        #Server_List = Process(target=self.listening)
-        #Server_List.start()
-        pass
