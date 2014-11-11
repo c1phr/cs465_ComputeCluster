@@ -18,9 +18,7 @@ class CentralServer(object):
         self._peer_list = {}
         self.job_queue = queue.Queue()
         self._user_list = []
-
-    def add_to_queue(self, file_name):
-        self.job_queue.put(file_name)
+        self._user_job_table = {}  # {aux_ip, user_ip} -> Used so we know what user gets output from who
 
     def send(self, to_send, aux_ip):
         """
@@ -43,15 +41,15 @@ class CentralServer(object):
         # Socket options: use ipv4
         self.socket_cx = socket.socket(
             socket.AF_INET, socket.SOCK_STREAM
-            )
+        )
         # More options: socket level, reuse socket
         self.socket_cx.setsockopt(
             socket.SOL_SOCKET, socket.SO_REUSEADDR, 1
-            )
+        )
         # Establish a connection
         self.socket_cx.connect(
             (aux_ip, self.listen_port)
-            )
+        )
         self.socket_cx.send(to_send)
         self.socket_cx.close()
 
@@ -82,25 +80,26 @@ class CentralServer(object):
 
                 if len(self._peer_list) > 0:
                     for ip, avail in self._peer_list.items():
-                            if avail:
-                                self._peer_list[ip] = False
-                                if (self.job_queue.qsize()) > 0:
-                                    # Operation will block if there is nothing in the queue until we have a job to execute
-                                    file = self.job_queue.get()
-                                    file_array = file_ops.file_to_bytes(file)
-                                    #job_message = Message('j', (file, bytes(file_array, 'UTF-8')))
-                                    job_message = (bytes(file_array, 'UTF-8'))
-                                    print("Sending: " + file)
-                                    self.send(job_message, ip)
+                        if avail:
+                            # Lock the aux processor so it doens't get more jobs until this one is done
+                            self._peer_list[ip] = False
+                            if (self.job_queue.qsize()) > 0:
+                                # Operation will block if there is nothing in the queue until we have a job to execute
+                                job = self.job_queue.get()
+                                file_array = file_ops.file_to_bytes(job[1])
+                                job_message = Message('j', bytes(file_array, 'UTF-8'))
+                                print("Sending job from: " + job[0])
+                                self._user_job_table[ip] = job[0]
+                                self.send(job_message, ip)
 
     def process(self, data, ip):
         data_dict = json.loads(data)
 
-        #Processor Connection
+        # Processor Connection
         if data_dict["flag"] == "pc":
             if ip:
                 self._peer_list[ip] = True
-                print (ip + " connected!")
+                print(ip + " connected!")
 
         #User Connection
         if data_dict["flag"] == "uc":
@@ -111,28 +110,17 @@ class CentralServer(object):
         #Disconnect
         if data_dict["flag"] == "d":
             if ip:
-                del self._peer_list
+                del self._peer_list[ip]
 
         #Returning data
         if data_dict["flag"] == "r":
-            print(ip + " --> " + data_dict["body"])
-            self._peer_list[ip] = True
-            print(self._peer_list)
+            print("From: " + ip + "For: " + self._user_job_table[ip] + " --> " + data_dict["body"])
+            # Forward the message onto the user and remove their relation in the user job table
+            self.send(data, self._user_job_table[ip])
+            del self._user_job_table[ip]
+            self._peer_list[ip] = True  # Set the flag for the aux processor so it can do more work
 
         #Recieving File
         if data_dict["flag"] == "f":
             print("Recieved file from " + ip)
-
-
-    def run(self):
-        print(self.ip_address)
-        while True:
-            for ip, avail in self._peer_list:
-                if avail:
-                    self._peer_list[ip] = not avail
-                    if len(self.job_queue) > 0:
-                        # Operation will block if there is nothing in the queue until we have a job to execute
-                        file = self.job_queue.get(block=True)
-                        file_array = file_ops.file_to_bytes(file)
-                        job_message = Message('j', (file, bytes(file_array, 'UTF-8')))
-                        self.send(job_message, ip)
+            self.job_queue.put([ip, data_dict["body"]])
